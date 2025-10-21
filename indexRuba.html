@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styleRuba.css">
+    <title>Ruba - music player</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="indexRuba.html">
+                <img id="RubaLogo" src="assets/RubaLogo.jpg" alt="Ruba Logo">
+            </a>
+            <div class="search_box">
+                <input type="text" placeholder="Search for your favorite songs.." id="user_input">
+                <button id="search_button">
+                    <img src="assets/searchGlass.png" alt="Ruba search bar logo" id="search_glass">
+                </button>
+                <div id="display_square" class="modal">
+                    <span onclick="document.getElementById('display_square').style.display='none'"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="playing_song">
+            <div id="rectangle">
+                <div class="details">
+                    <p id="song_title">Title</p>
+                    <p id="artist">Artist</p>
+                    <div id="picture_frame"></div>
+                </div>
+
+                <div class="controls">
+                    <img class="empty_heart" src="/assets/emptyHeart.png">
+                    <button class="play_button">
+                        <img src="/assets/playButton.png" id="play_triangle">
+                    </button>
+                    <img class="replay_icon" src="/assets/replay.png">
+                </div>
+                <input type="range" id="progressBar" value="0" min="0" max="100">
+            </div>
+        </section>
+        <section class="catalogue">
+            <div class="catalogue_header">
+                <p id="title_col">Title</p>
+                <p id="artist_col">Artist</p>
+                <p id="duration_col">
+                    <img id="watch_icon" src="/assets/watch.png" alt="watch icon">
+                </p>
+            </div>
+            <ul id="songs_list">
+                <!-- <li class="mini_song" data-src="/assets/songs/alsander - rolling.mp3">
+                    <img class="mini_cover"src="/assets/cover1.jpeg" alt="image">
+                    <p class="mini_title">Rolling</p>
+                    <p class="mini_artist">alsander</p>
+                    <p class="mini_duration">1:13</p>
+                    <button class="playBtn">
+                        <img src="/assets/miniPlayButton.png" class="mini_play_buttons">
+                    </button>
+                    <img src="/assets/fullHeart.png" class="mini_full_hearts">
+                </li> -->
+                <!-- <li class="mini_song" data-src="/assets/songs/Ketsa - Make Me Sad.mp3">
+                    <img class="mini_cover"src="/assets/cover2.jpeg" alt="image">
+                    <p class="mini_title">Make Me Sad</p>
+                    <p class="mini_artist">Ketsa</p>
+                    <p class="mini_duration">3:13</p>
+                    <button class="playBtn">
+                        <img src="/assets/miniPlayButton.png" class="mini_play_buttons">
+                    </button>
+                    <img src="/assets/fullHeart.png" class="mini_full_hearts">
+                </li> -->
+                <!-- <li class="mini_song" data-src="/assets/songs/Maarten Schellekens - Kura.mp3">
+                    <img class="mini_cover"src="/assets/cover3.jpg" alt="image">
+                    <p class="mini_title">Kura</p>
+                    <p class="mini_artist">Maarten Schellekens</p>
+                    <p class="mini_duration">3:29</p>
+                    <button class="playBtn">
+                        <img src="/assets/miniPlayButton.png" class="mini_play_buttons">
+                    </button>
+                    <img src="/assets/fullHeart.png" class="mini_full_hearts">
+                </li> -->
+                <!-- <li class="mini_song" data-src="/assets/songs/HoliznaCC0 - Mutant Club.mp3">
+                    <img class="mini_cover"src="/assets/cover4.jpeg" alt="image">
+                    <p class="mini_title">Mutant Club</p>
+                    <p class="mini_artist">HoliznaCC0</p>
+                    <p class="mini_duration">2:10</p>
+                    <button class="playBtn">
+                        <img src="/assets/miniPlayButton.png" class="mini_play_buttons">
+                    </button>
+                    <img src="/assets/fullHeart.png" class="mini_full_hearts">
+                </li> -->
+            </ul>
+            <audio id="audioPlayer"></audio>
+        </section>
+    </main>
+    <script src="appRuba.js"></script> 
+   
+    <!-- you need to put the script at the end of the <body>, because the js needs to run after the HTML is "finished", if you put it in the <head>, the js will have nothing
+        to work with, because the HTML comes only after, so the js will run first and then the HTML, but this is not what we want; we want the HTML and then the js to run!-->
+</body>
