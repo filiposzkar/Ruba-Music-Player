@@ -163,21 +163,61 @@ progressBar.addEventListener("input", () => {
 });
 
 
-//searching for a song section
-const search_button = document.getElementById("search_button");
-const input = document.getElementById("user_input");
+//searching for a song 
+const search_button = document.getElementById('search_button');
+const input = document.getElementById('user_input');
+const modal = document.getElementById('results_square');
+const close_button = document.querySelector('.close');
+const modal_body = document.getElementById('modal_body');
 
 search_button.addEventListener("click", () => {
-    const results = document.getElementById("display_square");
+    
+    modal.style.display = 'block';
+    const results = document.querySelector(".modal_content");
+    results.innerHTML = "";
+
     const user_input = input.value.trim();  //we use trim() to remove any extra spaces
+    results.innerHTML =  `<p style="color: #FEF2E3">What we found for "<span style="color: #FEF2E3">${user_input}</span>"...</p>`;
+
+
+    // add delegated click handler once (idempotent guard)
+    if (!results._hasDelegatedClick) {
+        results.addEventListener('click', (e) => {
+            const li = e.target.closest('.matching_title');
+            if (!li) return;
+            console.log('You clicked:', li.textContent);
+            // optional: find song object and play it
+            // const song = songs.find(s => s.title === li.textContent);
+            // if (song) { audioPlayer.src = song.src; audioPlayer.play(); }
+        });
+        results._hasDelegatedClick = true;
+    }
+
+    
     songs.forEach(item => {
-        if(item.title.includes(user_input)){
+        if(item.title.toLowerCase().includes(user_input.toLowerCase())){
             const matching_title = document.createElement("li");
             matching_title.classList.add("matching_title");
             matching_title.textContent = item.title;
+            matching_title.style.marginBottom = "10px";
+            matching_title.style.cursor = "pointer";
+
+            matching_title.addEventListener("click", () => {
+                console.log("You clicked:", item.title);
+            });
+
             results.append(matching_title);
         }   
     });
+});
+
+close_button.addEventListener("click", () => {
+    modal.style.display = 'none';
+});
+
+//this funcion closes the modal wherever we click on the dark background
+window.addEventListener('click', (event) => { 
+    if (event.target === modal) modal.style.display = 'none';
 });
 
 

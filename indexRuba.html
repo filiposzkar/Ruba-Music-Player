@@ -18,11 +18,17 @@
                 <button id="search_button">
                     <img src="assets/searchGlass.png" alt="Ruba search bar logo" id="search_glass">
                 </button>
-                <div id="display_square" class="modal">
-                    <span onclick="document.getElementById('display_square').style.display='none'"></span>
-                </div>
             </div>
         </nav>
+        <!-- This <div> acts as the background overlay and main wrapper for your popup window. (the dark grey background) -->
+            <div id="results_square" class="modal">  
+                <!-- This is the actual rectangle appearing with the search results -->
+                <div class="modal_content">
+                    <!-- This is the x button; &times is an HTML element that renders as "x", not sure what href="#" does :( -->
+                    <a href="#" class="close">&times;</a>
+                    <div id="modal_body"></div> <!-- this is where we'll put dynamic content -->
+                </div>
+            </div>
     </header>
     <main>
         <section class="playing_song">
