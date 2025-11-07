@@ -11,7 +11,8 @@ songs.forEach(item => {
         const li = document.createElement("li");  //this will be each <li> element from my <ul> songs_list from HTML
         li.classList.add("mini_song");
         li.dataset.src = item.src;
-
+        // <li class="mini_song" data-src="item.src">
+        // </li>
         const cover_art = document.createElement("img");
         cover_art.classList.add("mini_cover");
         cover_art.src = item.cover_art;
@@ -170,6 +171,7 @@ const modal = document.getElementById('results_square');
 const close_button = document.querySelector('.close');
 const modal_body = document.getElementById('modal_body');
 
+
 search_button.addEventListener("click", () => {
     
     modal.style.display = 'block';
@@ -179,21 +181,6 @@ search_button.addEventListener("click", () => {
     const user_input = input.value.trim();  //we use trim() to remove any extra spaces
     results.innerHTML =  `<p style="color: #FEF2E3">What we found for "<span style="color: #FEF2E3">${user_input}</span>"...</p>`;
 
-
-    // add delegated click handler once (idempotent guard)
-    if (!results._hasDelegatedClick) {
-        results.addEventListener('click', (e) => {
-            const li = e.target.closest('.matching_title');
-            if (!li) return;
-            console.log('You clicked:', li.textContent);
-            // optional: find song object and play it
-            // const song = songs.find(s => s.title === li.textContent);
-            // if (song) { audioPlayer.src = song.src; audioPlayer.play(); }
-        });
-        results._hasDelegatedClick = true;
-    }
-
-    
     songs.forEach(item => {
         if(item.title.toLowerCase().includes(user_input.toLowerCase())){
             const matching_title = document.createElement("li");
@@ -202,14 +189,61 @@ search_button.addEventListener("click", () => {
             matching_title.style.marginBottom = "10px";
             matching_title.style.cursor = "pointer";
 
+           
             matching_title.addEventListener("click", () => {
-                console.log("You clicked:", item.title);
-            });
+                //debugger
+                //console.log("You clicked:", item.title);
+                //alert("You clicked: " + item.title);
+                
+                // item.title.style.color = "#251737";
+                // item.title.style.backgroundColor = "#FEF2E3";
 
+                const displaying_title = document.getElementById("song_title");
+                displaying_title.textContent = item.title;
+
+                const displaying_artist = document.getElementById("artist");
+                displaying_artist.textContent = item.artist;
+
+                const displaying_square = document.getElementById("picture_frame");
+                displaying_square.style.backgroundImage = `url(${item.cover_art})`;
+                displaying_square.style.backgroundSize = "cover"; //the image covers the entire div
+                displaying_square.style.backgroundPosition = "center"; //the image is centered in the div
+                displaying_square.style.backgroundRepeat = "no-repeat"; //the image doesn't tile
+
+                currentSong = item;
+                audioPlayer.src = currentSong.src;
+                //audioPlayer.pause();
+                
+            });
             results.append(matching_title);
         }   
     });
 });
+
+
+const playing_button = document.getElementById("PLAY_BUTTON");
+    playing_button.addEventListener("click", () => {
+        //audioPlayer.src = item.src;
+        // if (audioPlayer.paused) { //the .paused property tells us if a song is playing (then .paused == true) or if it is on pause (then .paused == false)
+        //     audioPlayer.play();
+        // } 
+        // else {
+        //     audioPlayer.pause();
+        //     audioPlayer.loop = false;
+        // }
+        debugger
+        if (!currentSong) { // no song selected yet
+            return;
+        }
+
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+        } 
+        else {
+            audioPlayer.pause();
+        }
+    });
+
 
 close_button.addEventListener("click", () => {
     modal.style.display = 'none';
@@ -219,10 +253,3 @@ close_button.addEventListener("click", () => {
 window.addEventListener('click', (event) => { 
     if (event.target === modal) modal.style.display = 'none';
 });
-
-
-
-
-
-
-
