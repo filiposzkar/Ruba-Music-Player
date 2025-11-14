@@ -2,7 +2,8 @@ const songs = [
     { title: "Rolling", artist: "alsander", length: "1:13", src: "assets/songs/alsander - rolling.mp3", cover_art: "assets/cover1.jpeg", liked: 1 },
     { title: "Make Me Sad", artist: "Ketsa", length: "3:13", src: "assets/songs/Ketsa - Make Me Sad.mp3", cover_art: "assets/cover2.jpeg", liked: 1 },
     { title: "Kura", artist: "Maarten Schellekens", length: "3:29", src: "assets/songs/Maarten Schellekens - Kura.mp3", cover_art: "assets/cover3.jpg", liked: 1 },
-    { title: "Mutant Club", artist: "HoliznaCC0", length: "2:10", src: "assets/songs/HoliznaCC0 - Mutant Club.mp3", cover_art: "assets/cover4.jpeg", liked: 1 }
+    { title: "Mutant Club", artist: "HoliznaCC0", length: "2:10", src: "assets/songs/HoliznaCC0 - Mutant Club.mp3", cover_art: "assets/cover4.jpeg", liked: 1 },
+    { title: "We Have All We've Ever Wanted", artist: "YACHT", length: "4:22", src:"assets/songs/YACHT - We Have All We've Ever Wanted.mp3", cover_art: "assets/cover5.jpg", liked: 0}
 ];
 
 songs.forEach(item => {
@@ -59,6 +60,7 @@ const universal_picture = document.getElementById("picture_frame");
 
 /* for main button section */
 mainButton = document.querySelector(".play_button");
+const heart = document.getElementById("biggest_heart");
 image_on_mainButton = document.getElementById("play_triangle");
 const progressBar = document.getElementById("progressBar");
 let current_mini_button = null;
@@ -75,7 +77,7 @@ buttons.forEach(button => {
         const current_title = li.querySelector(".mini_title").textContent; //getting the value (with .textContent) of the element with the class "mini_title"
         const current_artist = li.querySelector(".mini_artist").textContent; //we use .querySelector() here because we only need the element having the class "mini_artist" from our current <li>; 
                                                                             // we don't need all the elements having the class "mini_artist"
-
+       
         const current_title_to_color = li.querySelector(".mini_title"); //getting the value (with .textContent) of the element with the class "mini_title"
         const current_artist_to_color = li.querySelector(".mini_artist");
         const current_time_to_color = li.querySelector(".mini_duration");
@@ -83,6 +85,7 @@ buttons.forEach(button => {
         const current_picture = li.querySelector(".mini_cover").src; // if we were to use .getElementById(), it would have returned all the elements from the class (we use it only for IDs)
         const play_image = li.querySelector(".mini_play_buttons");
 
+        
         if (clickedSong === currentSong) {
             // Same song → toggle play/pause
             if (audioPlayer.paused) { //the .paused property tells us if a song is playing (then .paused == true) or if it is on pause (then .paused == false)
@@ -90,11 +93,29 @@ buttons.forEach(button => {
                 play_image.src="/assets/miniPauseButton.png";
                 image_on_mainButton.src = "assets/pauseButton.png";
                 current_mini_button = li.querySelector(".mini_play_buttons"); //selecting the mini button corresponding to the current playing song so I can change the icon when the main button gets clicked
+                songs.forEach(song => {
+                    const full_path = new URL(song.src, window.location.origin).href;
+                    if(audioPlayer.src == full_path && song.liked == 1){
+                        heart.src = "/assets/fullHeart.png";
+                    }
+                    else if(audioPlayer.src == full_path && song.liked == 0){
+                        heart.src = "/assets/emptyHeart.png";
+                    }
+                })
             } 
             else {
                 audioPlayer.pause();
                 play_image.src="/assets/miniPlayButton.png";
                 image_on_mainButton.src = "assets/playButton.png";
+                songs.forEach(song => {
+                    const full_path = new URL(song.src, window.location.origin).href;
+                    if(audioPlayer.src == full_path && song.liked == 1){
+                        heart.src = "/assets/fullHeart.png";
+                    }
+                    else if(audioPlayer.src == full_path && song.liked == 0){
+                        heart.src = "/assets/emptyHeart.png";
+                    }
+                })
             }
         } 
         else {
@@ -106,6 +127,17 @@ buttons.forEach(button => {
             universal_picture.style.backgroundSize = "cover"; //the image covers the entire div
             universal_picture.style.backgroundPosition = "center"; //the image is centered in the div
             universal_picture.style.backgroundRepeat = "no-repeat"; //the image doesn't tile
+            //item.title.toLowerCase().includes(user_input.toLowerCase()))
+            
+            songs.forEach(song => {
+                const full_path = new URL(song.src, window.location.origin).href;
+                if(audioPlayer.src == full_path && song.liked == 1){
+                    heart.src = "/assets/fullHeart.png";
+                }
+                else if(audioPlayer.src == full_path && song.liked == 0){
+                    heart.src = "/assets/emptyHeart.png";
+                }
+            })
             
             if(previousSongLi) {
                 previousSongLi.querySelector(".mini_title").style.color = "#FEF2E3"; //changing back to old color once a new song gets selected
@@ -128,7 +160,68 @@ buttons.forEach(button => {
             audioPlayer.play();
             currentSong = clickedSong; // remember the new song
         }
+
     });
+});
+
+// adding the song the "liked songs" category if the heart image is clicked 
+heart.addEventListener("click", () => {
+    songs.forEach(song => {
+        const full_path = new URL(song.src, window.location.origin).href;
+        if(audioPlayer.src == full_path){
+            currentSong = song;
+        }
+    })
+
+    const all_songs = document.getElementById("songs_list");
+    const li = document.createElement("li"); 
+    if(currentSong.liked == 0){
+        
+        li.classList.add("mini_song");
+        li.dataset.src = currentSong.src;
+        // <li class="mini_song" data-src="item.src">
+        // </li>
+        const cover_art = document.createElement("img");
+        cover_art.classList.add("mini_cover");
+        cover_art.src = currentSong.cover_art;
+
+        const title = document.createElement("p");
+        title.classList.add("mini_title");
+        title.textContent = currentSong.title;
+
+        const artist = document.createElement("p");
+        artist.classList.add("mini_artist");
+        artist.textContent = currentSong.artist;
+
+        const length = document.createElement("p");
+        length.classList.add("mini_duration");
+        length.textContent = currentSong.length;
+
+        const play_button = document.createElement("button");
+        play_button.classList.add("playBtn");
+        const button_image = document.createElement("img");
+        button_image.src = "/assets/miniPlayButton.png";
+        button_image.classList.add("mini_play_buttons");
+        play_button.append(button_image);
+
+        const heart_image = document.createElement("img");
+        heart_image.classList.add("mini_full_hearts");
+        heart_image.src = "/assets/fullHeart.png";
+
+        currentSong.liked = 1;
+        heart.src = "assets/fullHeart.png";
+
+        li.append(cover_art, title, artist, length, play_button, heart_image);
+        all_songs.append(li);
+    }
+    else if(currentSong.liked == 1){
+        const li_to_remove = all_songs.querySelector(`li[data-src="${currentSong.src}"]`);
+        if(li_to_remove){
+            li_to_remove.remove();
+            currentSong.liked = 0;
+            heart.src = "/assets/emptyHeart.png";
+        }
+    }
 });
 
 
@@ -189,15 +282,9 @@ search_button.addEventListener("click", () => {
             matching_title.style.marginBottom = "10px";
             matching_title.style.cursor = "pointer";
 
-           
+            
             matching_title.addEventListener("click", () => {
-                //debugger
-                //console.log("You clicked:", item.title);
-                //alert("You clicked: " + item.title);
                 
-                // item.title.style.color = "#251737";
-                // item.title.style.backgroundColor = "#FEF2E3";
-
                 const displaying_title = document.getElementById("song_title");
                 displaying_title.textContent = item.title;
 
@@ -212,37 +299,26 @@ search_button.addEventListener("click", () => {
 
                 currentSong = item;
                 audioPlayer.src = currentSong.src;
-                //audioPlayer.pause();
-                
+                audioPlayer.play();
+                const playing_triangle = document.getElementById("play_triangle");
+                playing_triangle.src = "assets/pauseButton.png";
+
+                songs.forEach(song => {
+                    const full_path = new URL(song.src, window.location.origin).href;
+                    if(audioPlayer.src == full_path && song.liked == 1){
+                        heart.src = "/assets/fullHeart.png";
+                    }
+                    else if(audioPlayer.src == full_path && song.liked == 0){
+                        heart.src = "/assets/emptyHeart.png";
+                    }
+                })
             });
+
             results.append(matching_title);
         }   
     });
 });
 
-
-const playing_button = document.getElementById("PLAY_BUTTON");
-    playing_button.addEventListener("click", () => {
-        //audioPlayer.src = item.src;
-        // if (audioPlayer.paused) { //the .paused property tells us if a song is playing (then .paused == true) or if it is on pause (then .paused == false)
-        //     audioPlayer.play();
-        // } 
-        // else {
-        //     audioPlayer.pause();
-        //     audioPlayer.loop = false;
-        // }
-        debugger
-        if (!currentSong) { // no song selected yet
-            return;
-        }
-
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-        } 
-        else {
-            audioPlayer.pause();
-        }
-    });
 
 
 close_button.addEventListener("click", () => {

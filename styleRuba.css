@@ -44,10 +44,9 @@ body {
     left: 0;
     width: 100%; /*width and height cover the entire screen*/
     height: 100%;
-    background: rgba(0,0,0,0);
+    /*background: rgba(0,0,0,0);*/
     pointer-events: auto;
     /*z-index: 999;*/
-
 }
 
 
@@ -272,6 +271,7 @@ main {
     justify-content: center;
     cursor: pointer;
 }
+
 
 .catalogue_header, .mini_song{
     display: grid;
