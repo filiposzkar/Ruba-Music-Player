@@ -320,12 +320,187 @@ search_button.addEventListener("click", () => {
 });
 
 
-
 close_button.addEventListener("click", () => {
     modal.style.display = 'none';
 });
 
-//this funcion closes the modal wherever we click on the dark background
+
+//this addEventListener closes the modal wherever we click on the dark background
 window.addEventListener('click', (event) => { 
     if (event.target === modal) modal.style.display = 'none';
 });
+
+
+function find_cover_art_of_song() {
+    const path = new URL(audioPlayer.src).pathname; //the src attribute of a song
+    for(const song of songs){
+        if(song.src === path){
+            return song.cover_art;
+        }
+    }
+    return null;
+}
+
+
+//k-means clustering algorithm
+const extend_button = document.getElementById("extend_icon");
+debugger
+extend_button.addEventListener('click', function(){  
+
+    // Step 1 -> transforming our image into a dataset
+
+    const img = new Image(); // the selected image will be loaded into img
+    const dataSet = []; //this will be a list of sublists, where a sublist is [R, G, B] of a single pixel
+    
+    img.onload = function() { //when the image finally loaded into img
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d"); //Gets the 2D drawing context — the API that lets you draw pixels.
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0); //draws the loaded image onto the canvas
+
+        const imageData = ctx.getImageData(0, 0, img.width, img.height).data; //reads all the pixels from the canvas, and returns an object of type .data
+        // .data is a huge array, that can look like this: [R, B, G, A, R, G, B, A, R, G, B, A, ...] 4 numbers per pixel
+
+        
+        // we do this in order to "get rid" of the A of each pixel
+
+        for(let i = 0; i < imageData.length; i+=4){
+            const r = imageData[i];
+            const g = imageData[i+1];
+            const b = imageData[i+2];
+
+            dataSet.push([r, g, b]);
+        }
+    };
+
+    // need to set the img.src to the path of the corresponding image
+    const image_path = find_cover_art_of_song();
+    img.src = image_path;
+
+
+
+    // Step 2 -> choosing k random cluster points from dataset
+    
+    const k = 3;
+    const centroids = []; //here we will store our cluster points (the k representitive colors)
+    const used_indices = new Set(); //we want to keep track of the used indices for cluster points, because we dont want the same pixel being the cluster point for multiple groups at once
+    while(centroids.length < k) {
+        const random_index = Math.floor(Math.random() * (centroids.length - 1));
+        if(!used_indices.has(random_index)){
+            const random_pixel = dataSet[random_index];
+            centroids.push(random_pixel);
+            used_indices.add(random_index);
+        }
+    }    
+
+
+    let converged = false;
+    let iterations = 0;
+    const max_iterations = 100;
+
+    const clusters = []; //this will be an array of k subarrays, each subarray representing a cluster/group of pixels (arrays of pixels assigned to each centroid)
+    for(let i = 0; i < k; i++){
+        clusters.push([]);
+    }
+
+    while(converged == false && iterations < max_iterations){
+        iterations++;
+
+        const old_centroids = []; // here we will keep a deep copy of our centroids, because they will change throughout the execution
+        // and we will need to check the old and new values later on
+        for(let i = 0; i < centroids.length; i++){
+            const copy = [ centroids[i][0], centroids[i][1], centroids[i][2] ];
+            old_centroids.push(copy);
+        }
+
+
+        // Step 3 -> Assign every pixel from the dataset to its closest cluster point
+        dataSet.forEach(pixel => {
+            let min_distance = Infinity;
+            let cluster_index = 0;
+
+            centroids.forEach((centroid, centroid_index) => { //the second parameter of forEach is always the centroid_index
+                const red = pixel[0] - centroid[0];
+                const green = pixel[1] - centroid[1];
+                const blue = pixel[2] - centroid[2];
+                const distance = Math.sqrt(red*red + green*green + blue*blue); //computing the distance between the current pixel and current centroid
+                //we use the Euclidian formula for this
+
+                if(distance < min_distance) {
+                    min_distance = distance;
+                    cluster_index = centroid_index;
+                }
+            });
+
+            clusters[cluster_index].push(pixel); //we will add the pixel into the subarray in the coresponding array of the centroid (on position cluster_index)
+        });
+
+
+
+
+        // Step 4 -> Computing the mean RGB of each cluster
+        // we do this, because we no longer want the centroid of this cluster to be a random pixel, but to be in the middle of its cluster
+        // this makes sure that the algorithm improves -> will talk about it later
+        for(let i = 0; i < k; i++){
+            let mean_red = 0;
+            let mean_green = 0;
+            let mean_blue = 0;
+
+            for (let j = 0; j < clusters[i].length; j++) {
+                mean_red += clusters[i][j][0];
+                mean_green += clusters[i][j][1];
+                mean_blue += clusters[i][j][2];
+            }
+
+            mean_red /= clusters[i].length;
+            mean_green /= clusters[i].length;
+            mean_blue /= clusters[i].length;
+
+            const new_centroid = [mean_red, mean_green, mean_blue];
+            centroids[i] = new_centroid;
+        }
+
+
+        // Step 5 -> Check if the centroids changed
+        // This step is important, because, in the case that the centroids have not changed, that means that the algorithm is over.
+        // If the centroids have not changed, then it means that they have reached their final possible positions, so it is useless to continue
+        // the algorithm, cause the effect will be the same.
+        let count = 0;
+        for(let i = 0; i < centroids.length; i++){
+            const current = centroids[i];
+            const previous = old_centroids[i];
+            if(current[0] == previous[0] && current[1] == previous[1] && current[2] == previous[2]) {
+                count++;
+            }
+            else{
+                break;
+            }
+        }
+        if(count == centroids.length){
+            converged = true;
+            break;
+        }
+
+        // The k-means cluster algorithm has finished here, next up I will set some squares' colors to the colors "computed" above
+
+        // Step 6 -> Receiving the colors
+        const collorPallete = document.getElementById("color-pallete");
+
+        for(let i = 0; i < centroids.length; i++){
+            const [r, g, b] = centroids[i];
+            const colorful_square = document.createElement("div");
+
+            square.style.backgroundColor = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+            square.style.height = "50px";
+            square.style.width = "50px";
+
+            collorPallete.appendChild(colorful_square);
+        }
+
+
+        
+    }
+})

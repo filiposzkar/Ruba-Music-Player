@@ -44,7 +44,7 @@
                     <button class="play_button", id="PLAY_BUTTON">
                         <img src="/assets/playButton.png" id="play_triangle">
                     </button>
-                    <img class="replay_icon" src="/assets/replay.png">
+                    <img id="extend_icon" src="/assets/replay.png">
                 </div>
                 <input type="range" id="progressBar" value="0" min="0" max="100">
             </div>
@@ -56,6 +56,7 @@
                 <p id="duration_col">
                     <img id="watch_icon" src="/assets/watch.png" alt="watch icon">
                 </p>
+                <p id="drop_menu">Filter songs</p>
             </div>
             <ul id="songs_list">
                 <!-- <li class="mini_song" data-src="/assets/songs/alsander - rolling.mp3">
@@ -101,6 +102,17 @@
             </ul>
             <audio id="audioPlayer"></audio>
         </section>
+
+
+        <!-- creates a file picker -->
+        <!-- <input type="file" id="imageInput">  -->
+         
+        <!-- canvas allows JavaScript to read pixel data and draw the image -->
+        <canvas id="canvas" style="display:none;"></canvas>
+
+        <!-- flex arranges the squares in a row -->
+        <div id="color_pallete" style="display: flex; gap: 10px; margin-top: 20px;"></div> 
+
     </main>
     <script src="appRuba.js"></script> 
    

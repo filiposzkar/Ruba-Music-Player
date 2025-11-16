@@ -173,7 +173,7 @@ main {
     cursor: pointer;
 }
 
-.replay_icon {
+#extend_icon {
     width: 30px;
     height: 30px;
     cursor: pointer;
@@ -250,10 +250,16 @@ main {
 
 #title_col {
     color: #725F8B;
+    margin-left: 30px;
 }
 
 #artist_col {
     color:#725F8B;
+}
+
+#drop_menu {
+    color:#725F8B;
+    margin-left: 190px;
 }
 
 #watch_icon {
@@ -294,10 +300,6 @@ main {
   padding: 8px 12px;
 }
 
-#title_col {
-    margin-left: 30px;
-}
-
 .mini_cover {
     width: 30px;
     height: 30px;
@@ -329,4 +331,6 @@ main {
     height: 14px;
     cursor: pointer;
 }
+
+
 
