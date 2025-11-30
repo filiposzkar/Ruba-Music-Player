@@ -6,6 +6,7 @@ const songs = [
     { title: "We Have All We've Ever Wanted", artist: "YACHT", length: "4:22", src:"assets/songs/YACHT - We Have All We've Ever Wanted.mp3", cover_art: "assets/cover5.jpg", liked: 0}
 ];
 
+
 songs.forEach(item => {
     if(item.liked == 1){
         const all_songs = document.getElementById("songs_list");
@@ -332,7 +333,10 @@ window.addEventListener('click', (event) => {
 
 
 function find_cover_art_of_song() {
-    const path = new URL(audioPlayer.src).pathname; //the src attribute of a song
+    const path = decodeURIComponent(new URL(audioPlayer.src).pathname).replace(/^\/+/, ""); //the src attribute of a song
+    // decodeURIComponent converts URL-encoded characters back to normal text; URL uses different notations for different things; ex: space in URL is %20
+    // so it will return the path of the song, but wherever there is space, it will add %20, and we don't want that, cause that is not how we have the path of the song stored
+    // .replace() replaces all slashes with "", to make sure that the number of slashes is not different (it removes the slashes from the beginning)
     for(const song of songs){
         if(song.src === path){
             return song.cover_art;
@@ -344,51 +348,38 @@ function find_cover_art_of_song() {
 
 //k-means clustering algorithm
 const extend_button = document.getElementById("extend_icon");
-debugger
-extend_button.addEventListener('click', function(){  
 
-    // Step 1 -> transforming our image into a dataset
+// Step 1 -> transforming our image into a dataset   
 
-    const img = new Image(); // the selected image will be loaded into img
-    const dataSet = []; //this will be a list of sublists, where a sublist is [R, G, B] of a single pixel
+const dataSet = []; //this will be a list of sublists, where a sublist is [R, G, B] of a single pixel
+const img = new Image(); // the selected image will be loaded into img
+img.onload = function() { //when the image finally loaded into img
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d"); //Gets the 2D drawing context — the API that lets you draw pixels.
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    ctx.drawImage(img, 0, 0); //draws the loaded image onto the canvas
+
+    const imageData = ctx.getImageData(0, 0, img.width, img.height).data; //reads all the pixels from the canvas, and returns an object of type .data
+    // .data is a huge array, that can look like this: [R, B, G, A, R, G, B, A, R, G, B, A, ...] 4 numbers per pixel
     
-    img.onload = function() { //when the image finally loaded into img
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d"); //Gets the 2D drawing context — the API that lets you draw pixels.
+    // we do this in order to "get rid" of the A of each pixel
+    for(let i = 0; i < imageData.length; i+=4){
+        const r = imageData[i];
+        const g = imageData[i+1];
+        const b = imageData[i+2];
 
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        ctx.drawImage(img, 0, 0); //draws the loaded image onto the canvas
-
-        const imageData = ctx.getImageData(0, 0, img.width, img.height).data; //reads all the pixels from the canvas, and returns an object of type .data
-        // .data is a huge array, that can look like this: [R, B, G, A, R, G, B, A, R, G, B, A, ...] 4 numbers per pixel
-
-        
-        // we do this in order to "get rid" of the A of each pixel
-
-        for(let i = 0; i < imageData.length; i+=4){
-            const r = imageData[i];
-            const g = imageData[i+1];
-            const b = imageData[i+2];
-
-            dataSet.push([r, g, b]);
-        }
-    };
-
-    // need to set the img.src to the path of the corresponding image
-    const image_path = find_cover_art_of_song();
-    img.src = image_path;
-
-
+        dataSet.push([r, g, b]);
+    }
 
     // Step 2 -> choosing k random cluster points from dataset
-    
     const k = 3;
     const centroids = []; //here we will store our cluster points (the k representitive colors)
     const used_indices = new Set(); //we want to keep track of the used indices for cluster points, because we dont want the same pixel being the cluster point for multiple groups at once
     while(centroids.length < k) {
-        const random_index = Math.floor(Math.random() * (centroids.length - 1));
+        const random_index = Math.floor(Math.random() * (dataSet.length - 1));
         if(!used_indices.has(random_index)){
             const random_pixel = dataSet[random_index];
             centroids.push(random_pixel);
@@ -396,10 +387,10 @@ extend_button.addEventListener('click', function(){
         }
     }    
 
-
+    
     let converged = false;
     let iterations = 0;
-    const max_iterations = 100;
+    const max_iterations = 15;
 
     const clusters = []; //this will be an array of k subarrays, each subarray representing a cluster/group of pixels (arrays of pixels assigned to each centroid)
     for(let i = 0; i < k; i++){
@@ -487,20 +478,26 @@ extend_button.addEventListener('click', function(){
         // The k-means cluster algorithm has finished here, next up I will set some squares' colors to the colors "computed" above
 
         // Step 6 -> Receiving the colors
-        const collorPallete = document.getElementById("color-pallete");
+        const collorPallete = document.getElementById("color_pallete");
 
         for(let i = 0; i < centroids.length; i++){
             const [r, g, b] = centroids[i];
             const colorful_square = document.createElement("div");
 
-            square.style.backgroundColor = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-            square.style.height = "50px";
-            square.style.width = "50px";
+            colorful_square.style.backgroundColor = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+            colorful_square.style.height = "50px";
+            colorful_square.style.width = "50px";
 
             collorPallete.appendChild(colorful_square);
         }
-
-
         
     }
+};
+
+img.onerror = () => { alert("img error") }
+
+extend_button.addEventListener('click', function() { 
+    // need to set the img.src to the path of the corresponding image
+    const image_path = find_cover_art_of_song();
+    img.src = image_path;
 })
