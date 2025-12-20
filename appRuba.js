@@ -375,7 +375,7 @@ img.onload = function() { //when the image finally loaded into img
     }
 
     // Step 2 -> choosing k random cluster points from dataset
-    const k = 3;
+    const k = 5;
     const centroids = []; //here we will store our cluster points (the k representitive colors)
     const used_indices = new Set(); //we want to keep track of the used indices for cluster points, because we dont want the same pixel being the cluster point for multiple groups at once
     while(centroids.length < k) {
@@ -478,26 +478,72 @@ img.onload = function() { //when the image finally loaded into img
         // The k-means cluster algorithm has finished here, next up I will set some squares' colors to the colors "computed" above
 
         // Step 6 -> Receiving the colors
-        const collorPallete = document.getElementById("color_pallete");
+        // const collorPallete = document.getElementById("color_pallete");
 
-        for(let i = 0; i < centroids.length; i++){
-            const [r, g, b] = centroids[i];
-            const colorful_square = document.createElement("div");
+        // for(let i = 0; i < centroids.length; i++){
+        //     const [r, g, b] = centroids[i];
+        //     const colorful_square = document.createElement("div");
 
-            colorful_square.style.backgroundColor = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-            colorful_square.style.height = "50px";
-            colorful_square.style.width = "50px";
+        //     colorful_square.style.backgroundColor = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+        //     colorful_square.style.height = "50px";
+        //     colorful_square.style.width = "50px";
 
-            collorPallete.appendChild(colorful_square);
-        }
+        //     collorPallete.appendChild(colorful_square);
+        // }
         
+        debugger
+        centroids.forEach((centroid, index) => {
+            const [r, g, b] = centroid.map(Math.round); // rounding the values to integers
+            const RGBstring = `rgb(${r}, ${g}, ${b})`; // create a valid CSS colour
+            document.documentElement.style.setProperty(`--centroid-${index}`, RGBstring);
+
+            //document.documentElement -> modifying styles globally, for the whole document
+            //.style.setProperty(`--centroid-${index}`, centroid); -> creates a CSS variable on the <html> element
+        })
     }
 };
 
-img.onerror = () => { alert("img error") }
+//img.onerror = () => { alert("img error") }
 
 extend_button.addEventListener('click', function() { 
     // need to set the img.src to the path of the corresponding image
     const image_path = find_cover_art_of_song();
     img.src = image_path;
+})
+
+
+// animation on cover_art
+
+current_cover_art = document.getElementById("picture_frame")
+rectangle_section = document.getElementById("rectangle")
+catalogue_section = document.querySelector(".catalogue")
+artist_label = document.getElementById("artist")
+title_label = document.getElementById("song_title")
+control_buttons = document.querySelector(".controls")
+let moved = false;
+
+current_cover_art.addEventListener('click', () => {
+    debugger
+    
+    // const image_path = find_cover_art_of_song();
+    // img.src = image_path;
+
+    rectangle_section.style.animation = "none"; 
+    void rectangle_section.offsetWidth;   
+
+    if(!moved) {
+        rectangle_section.style.animation = "expand_rectangle 1s forwards";  
+        catalogue_section.style.animation = "hide_catalogue 0.85s forwards";
+        title_label.style.backgroundColor = "transparent";
+        artist_label.style.backgroundColor = "transparent";
+        control_buttons.style.backgroundColor = "transparent"
+    }
+    else {
+        rectangle_section.style.animation = "shrink_rectangle 1s forwards";
+        catalogue_section.style.animation = "show_catalogue 0.85s forwards"; 
+        title_label.style.backgroundColor = "#251737";
+        artist_label.style.backgroundColor = "#251737";
+        control_buttons.style.backgroundColor = "#251737";
+    }
+    moved = !moved;
 })

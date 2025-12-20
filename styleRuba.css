@@ -22,8 +22,8 @@ body {
 .search_box {
     display: flex;
     align-items: center;
-    margin-left: 450px;
-    margin-top: 20px;
+    margin-left: 460px;
+    margin-top: 2px;
 }
 
 #user_input {
@@ -127,13 +127,14 @@ main {
     display: grid;
     grid-template-areas: 'currentSong catalogue catalogue';
     grid-template-columns: 1fr 1fr 1fr;
+    padding: 0 28px;
 }
 
 
 .playing_song {
-    padding-left: 30px; /* this lefts a margin on the left side of the screen - the rectangle is not glued on the left margin*/
-    padding-top: 20px;
     grid-area: currentSong;
+    display: flex; /*to vertically center the child (in our case: rectangle)*/
+    justify-content: center; /*to vertically center*/
 }
 
 #rectangle {
@@ -149,6 +150,27 @@ main {
     justify-content: center; /*center vertically*/
     align-items: center;     /*center horizontally*/
 }
+
+@keyframes expand_rectangle {
+    to {
+        width: 95vw;
+        /* background-image: linear-gradient(to bottom, var(--centroid-0), var(--centroid-1), var(--centroid-2)); */
+        background-image: linear-gradient(to right, var(--centroid-0), var(--centroid-1)),
+                  radial-gradient(circle at top left, var(--centroid-2), var(--centroid-0));
+    }
+    /* 0% { background-image: linear-gradient(to bottom, var(--centroid-0), var(--centroid-1)); }
+    50% { background-image: linear-gradient(to bottom, var(--centroid-1), var(--centroid-2)); }
+    100% { background-image: linear-gradient(to bottom, var(--centroid-2), var(--centroid-0)); } */
+}
+
+
+@keyframes shrink_rectangle {
+    to {
+        width: 400px;
+        background-image: none;
+    }
+} 
+
 
 .play_button {
     background-color: #FEF2E3;
@@ -208,7 +230,7 @@ main {
     align-items: center;
     justify-content: flex-start; /* stacks items vertically */
     flex-direction: column; /* aligns items from top */
-    background-color: #251737;
+    /* background-color: #251737; */
     margin-top: 20px;
 }
 
@@ -229,12 +251,25 @@ main {
     margin-top: 10px;
 }
 
+
 #picture_frame {
     background-color: #FEF2E3;
     width: 300px;
     height: 300px;
     margin-bottom: 20px;
     border-radius: 5%;
+    cursor: pointer;
+    z-index: 999;
+}
+
+@keyframes hide_catalogue {
+    from {display: block;}
+    to {display: none;}  
+}
+
+@keyframes show_catalogue {
+    from {display: none;}
+    to {display: block;}  
 }
 
 .catalogue {
